@@ -1,0 +1,125 @@
+# Hand-written curation layered over the schema generated from alsoft.ini.
+#
+# The generated half is rebuilt from upstream on every run; this file is the
+# durable half. OpenAL Soft documents its options thoroughly in the sample config,
+# so the parser already recovers a real description and a choice list for most of
+# them. This file only supplies what prose cannot convey.
+#
+# Keys are the GENERATED option paths, before any regrouping below is applied.
+
+Groups:
+  Output:
+    Description: Core audio output configuration
+    Include:
+      - General.Channels
+      - General.Sample_type
+      - General.Frequency
+      - General.Stereo_mode
+      - General.Stereo_encoding
+      - General.Ambi_format
+
+  Hrtf:
+    DisplayName: HRTF
+    Description: Head-related transfer function, for positional audio over headphones
+    Include:
+      - General.Hrtf
+      - General.Hrtf_mode
+      - General.Default_hrtf
+
+  Performance:
+    Description: Buffering and mixing quality
+    Include:
+      - General.Period_size
+      - General.Periods
+      - General.Resampler
+      - General.Sources
+      - General.Slots
+
+Options:
+  General.Drivers:
+    DisplayName: Backend Order
+    Description: >
+      Comma-separated backend priority. Leave empty to try all available backends,
+      which is almost always correct on Windows.
+
+  General.Channels:
+    DisplayName: Channel Configuration
+
+  General.Frequency:
+    DisplayName: Output Sample Rate
+    Description: >
+      Output sample rate in Hz. Leave empty to follow the system mixer; forcing a
+      rate the device does not support only introduces resampling.
+
+  General.Hrtf:
+    DisplayName: HRTF Mode
+
+  General.Sources:
+    DisplayName: Maximum Sources
+    Description: >
+      Maximum number of simultaneous sources. Older titles rarely need more than
+      the default, and raising it costs CPU.
+
+  # The options below document their valid values as an indented
+  # "value - explanation" block rather than an inline comma-separated list, which
+  # ChoiceCommentPattern cannot harvest. Supplying them here is exactly what the
+  # overlay is for. They were found by the validator, which flags any option whose
+  # default is not among its own choices.
+  General.Sample_type:
+    DisplayName: Output Sample Type
+    Choices: [int8, uint8, int16, uint16, int32, uint32, float32]
+
+  General.Stereo_encoding:
+    DisplayName: Stereo Encoding
+    Choices: [basic, uhj, tsme, hrtf]
+
+  General.Resampler:
+    DisplayName: Resampler
+    Choices:
+      - point
+      - linear
+      - spline
+      - gaussian
+      - bsinc12
+      - fast_bsinc12
+      - bsinc24
+      - fast_bsinc24
+      - bsinc48
+      - fast_bsinc48
+
+  General.Cf_level:
+    DisplayName: Crossfeed Level
+    Description: >
+      Crossfeed bleeds a little of each stereo channel into the other, which some
+      listeners find more natural over headphones. No effect on non-stereo modes.
+    Choices:
+      - { Value: '0', DisplayName: 'Off' }
+      - { Value: '1', DisplayName: 'Low' }
+      - { Value: '2', DisplayName: 'Middle' }
+      - { Value: '3', DisplayName: 'High' }
+      - { Value: '4', DisplayName: 'Low (easy)' }
+      - { Value: '5', DisplayName: 'Middle (easy)' }
+      - { Value: '6', DisplayName: 'High (easy)' }
+
+  Uhj.Decode_filter:
+    DisplayName: UHJ Decode Filter
+    Choices: [iir, fir256, fir512]
+
+  Uhj.Encode_filter:
+    DisplayName: UHJ Encode Filter
+    Choices: [iir, fir256, fir512]
+
+  Tsme.Encode_filter:
+    DisplayName: Surround Matrix Encode Filter
+    Choices: [iir, fir256, fir512]
+
+# Backend-specific tuning for platforms a Windows game will never reach. These
+# would only clutter the admin UI.
+Exclude:
+  - Pipewire.*
+  - Pulse.*
+  - Alsa.*
+  - Oss.*
+  - Solaris.*
+  - Jack.*
+  - Port.*

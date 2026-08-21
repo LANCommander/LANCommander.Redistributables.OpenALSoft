@@ -1,0 +1,65 @@
+# Identity ---------------------------------------------------------------------
+#
+# Id and every GUID under Scripts are generated ONCE and must never change.
+#
+# RedistributableImporter matches an incoming record with
+#   r.Id == record.Id || r.Name == record.Name
+# so a regenerated GUID makes every published release import as a brand new
+# redistributable instead of updating the existing one.
+
+Id: 65556e71-4a6e-4962-a5f9-9f4919d2e4d0
+Name: OpenAL Soft
+
+Description: >
+  A software implementation of the OpenAL 3D audio API. Drop-in replacement for
+  the original Creative OpenAL runtime, which many older titles require and which
+  no longer installs cleanly on modern Windows.
+
+Notes: >
+  OpenAL Soft is (c) the OpenAL Soft contributors and distributed under the GNU
+  Library General Public License v2. See LICENSES/NOTICE.md.
+
+LastKnownVersion: "1.25.2"
+
+# Payload ----------------------------------------------------------------------
+Source:
+  Mode: download
+  Resolver: github-release
+  Url: https://github.com/kcat/openal-soft
+  AssetPattern: '-bin\.zip$'
+
+# Configuration ----------------------------------------------------------------
+#
+# alsoftrc.sample is the upstream-documented option set. source.ps1 places it in
+# the payload as alsoft.ini, which is the filename OpenAL Soft actually reads.
+ConfigPaths:
+  - alsoft.ini
+
+ConfigFormat: ini
+
+# alsoftrc.sample ships with every option commented out at its default value, so
+# without this the file parses to nothing at all.
+IncludeCommentedKeys: true
+
+# The sample config documents valid values in prose above each key, in the form
+# "The available values are: mono, stereo, quad, ...". Harvesting them keeps the
+# choice lists correct as upstream adds new ones.
+ChoiceCommentPattern: '(?i)values are:?\s*(?<choices>[^.]+)'
+
+# Scripts ----------------------------------------------------------------------
+Scripts:
+  DetectInstall:
+    Id: d2b05583-a02c-47fc-a508-11905e63293a
+    Platforms: Windows
+    Description: Checks whether soft_oal has already been deployed to the game directory.
+  Install:
+    Id: 52569f2f-6aa1-4886-b0cf-9cdee50b1234
+    Platforms: Windows
+    Description: Copies the architecture-appropriate OpenAL runtime beside the game executable.
+  Uninstall:
+    Id: 89abcb3e-37e6-4bee-a7f1-02f36d565e3c
+    Platforms: Windows
+    Description: Removes the files this redistributable deployed.
+  Package:
+    Id: 3821ca84-e4e7-4ae9-8c03-bb749f08546c
+    Description: Server-side updater that tracks this repository's releases.
